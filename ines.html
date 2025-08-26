@@ -1,189 +1,179 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pedido de Namoro</title>
   <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f0f0f0;
-      font-family: 'Arial', sans-serif;
+    :root{
+      --bg: #f0f8ff;         /* azul muito claro */
+      --fg: #1e293b;         /* azul escuro suave */
+      --card: #ffffff;       /* branco */
+      --accent: #93c5fd;     /* azul claro */
+      --accent-2: #f9a8d4;   /* rosa claro */
+      --ok: #60a5fa;         /* azul vivo */
+      --no: #f87171;         /* vermelho suave */
+      --shadow: 0 10px 30px rgba(0,0,0,.2);
+      --radius: 18px;
     }
 
-    .container {
-      text-align: center;
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; font-family: 'Arial', sans-serif; }
+    body{
+      display:grid; place-items:center; background:var(--bg); color:var(--fg); padding:20px;
+      background: linear-gradient(135deg, #f0f8ff, #fdf2f8); /* azul + rosa claro */
     }
 
-    .question-bubble {
-      background-color: #fff;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-      display: inline-block;
-      margin-bottom: 20px;
+    .wrap{ width:min(700px, 100%); text-align:center; }
+    .card{
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 22px;
       position: relative;
     }
 
-    .question-bubble p {
-      margin: 0;
-      font-size: 24px;
-      color: #333;
+    .title{
+      font-size:clamp(20px, 3.5vw, 28px);
+      margin:0 0 12px;
+      font-weight:700;
+      color: var(--accent);
+    }
+    .subtitle{
+      font-size:16px;
+      opacity:.9; margin:0 0 18px;
     }
 
-    .button-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .btns{ 
+      display:flex; gap:12px; justify-content:center; flex-wrap:wrap; 
+      margin-top:14px; position: relative; 
+      min-height: 56px; /* reserva espaço quando o "Não" se move */
     }
 
-    .button {
-      padding: 10px 20px;
-      font-size: 18px;
-      border: none;
-      cursor: pointer;
-      margin: 10px;
-      border-radius: 5px;
-      transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    button{
+      border:0; cursor:pointer;
+      padding:14px 20px; border-radius:12px; font-weight:700;
+      color:white; box-shadow:0 6px 15px rgba(0,0,0,.25);
+      min-width:120px; font-size:16px; transition: transform .15s ease;
     }
+    .yes{ background:linear-gradient(135deg, var(--ok), #3b82f6); }
+    .no{ 
+      background:linear-gradient(135deg, var(--no), #fb7185);
+      position: fixed; /* permite mover pela viewport */
+      z-index: 5;
+    }
+    button:hover{ transform:scale(1.05); }
 
-    .green {
-      background-color: #4caf50;
-      color: white;
+    /* Modal */
+    .modal{
+      position:fixed; inset:0; display:none; place-items:center; padding:20px;
+      background:rgba(0,0,0,.4);
+      z-index:10;
     }
-
-    .red {
-      background-color: #f44336;
-      color: white;
+    .modal[open]{ display:grid; }
+    .modal-card{
+      background:var(--card); border-radius:var(--radius);
+      padding:22px; width:min(500px, 100%); text-align:center;
+      box-shadow:var(--shadow);
     }
-
-    .button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .heart-float {
-      position: absolute;
-      width: 100px; /* Tamanho do coração ajustado */
-      height: 100px; /* Tamanho do coração ajustado */
-      animation: heartFloat 4s infinite ease-in-out;
-    }
-
-    .heart-float img {
-      width: 100%;
-      height: 100%;
-    }
-
-    .heart-modal {
-      background-color: white;
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      display: none; /* Inicialmente escondido */
-      position: absolute; /* Posição absoluta */
-      top: 50%; /* Centralizar verticalmente */
-      left: 50%; /* Centralizar horizontalmente */
-      transform: translate(-50%, -50%); /* Centralizar no meio da tela */
-      z-index: 999; /* Colocá-lo acima de outros elementos */
-    }
-
-    .heart-modal p {
-      font-size: 18px;
-      color: #333;
-    }
-
-    @keyframes heartFloat {
-      0%, 100% {
-        transform: translateY(0) scale(1);
-      }
-      50% {
-        transform: translateY(-20vh) scale(1.2);
-      }
-    }
+    .modal-card h2{ margin:0 0 10px; color:var(--accent-2); }
+    .ok{ margin-top:14px; background:linear-gradient(135deg, var(--accent-2), var(--accent)); border:0; padding:12px 18px; border-radius:12px; color:white; font-weight:bold; }
   </style>
-  <title>Pedido de Namoro</title>
 </head>
 <body>
-  <div class="container">
-    <div class="question-bubble">
-      <p>Rita, quer namorar comigo?</p>
+  <main class="wrap">
+    <section class="card">
+      <h1 class="title">Inês, quer namorar comigo?</h1>
+      <p class="subtitle">
+        Prometo cuidar de ti, arrancar sorrisos, fazer-te arrepiar, dividir pizzas e Somersby,  
+        e dormir de conchinha sempre que precisares de colo. 💙💖
+      </p>
+      <div class="btns" id="btnGroup">
+        <button class="yes" id="yesBtn">Sim</button>
+        <button class="no" id="noBtn">Não (ainda)</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <dialog class="modal" id="modal">
+    <div class="modal-card">
+      <h2>Escolheste “Sim” 💘</h2>
+      <p>
+        Tu és maravilhosa, Inês. 💖<br>
+        Vou cuidar muito bem de ti, respeitar os teus limites e ser o motivo dos teus melhores momentos.  
+        Massagem, carinho, arrepio, pizza e conchinha — tudo contigo faz sentido. 💙
+      </p>
+      <button class="ok" id="okBtn">Que comece a nossa história</button>
     </div>
-    <div class="button-container">
-      <button id="yesButton" class="button green">Sim</button>
-      <button id="noButton" class="button red">Não</button>
-    </div>
-  </div>
-  <div class="heart-container" id="heartContainer">
-    <div class="heart-modal" id="heartModal">
-      <p>Tu é incrível, vou cuidar muito bem de ti.<br>Era para ser apenas um cafezinho às 3 da manhã no hospital né?</p>
-    </div>
-  </div>
+  </dialog>
+
   <script>
-    const yesButton = document.getElementById("yesButton");
-    const noButton = document.getElementById("noButton");
-    const heartContainer = document.getElementById("heartContainer");
-    const heartModal = document.getElementById("heartModal"); // Modal do coração
-    let noButtonClickCount = 0;
+    const yes = document.getElementById('yesBtn');
+    const no = document.getElementById('noBtn');
+    const modal = document.getElementById('modal');
+    const okBtn = document.getElementById('okBtn');
 
-    function createFloatingHeart() {
-      const heartFloat = document.createElement("div");
-      heartFloat.classList.add("heart-float");
-      const heartImg = document.createElement("img");
-      heartImg.src = "https://www.pngall.com/wp-content/uploads/13/Red-Heart-Love-Transparent.png"; // Substitua com o caminho da imagem
-      heartFloat.appendChild(heartImg);
-      document.body.appendChild(heartFloat);
+    // Modal do "Sim"
+    yes.addEventListener('click', () => {
+      modal.showModal();
+    });
+    okBtn.addEventListener('click', () => {
+      modal.close();
+    });
 
-      const maxWidth = window.innerWidth - heartFloat.clientWidth;
-      const randomX = Math.floor(Math.random() * maxWidth);
-      heartFloat.style.left = `${randomX}px`;
+    // Botão "Não" que muda de posição a cada clique e alerta após o 5º
+    let noClickCount = 0;
 
-      const animationDuration = Math.random() * 8 + 4;
-      heartFloat.style.animation = `heartFloat ${animationDuration}s infinite ease-in-out`;
+    function moveNoButton() {
+      // margem para não grudar nas bordas
+      const margin = 10; 
+      const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
-      setTimeout(() => {
-        document.body.removeChild(heartFloat);
-      }, animationDuration * 1000);
+      const bw = no.offsetWidth || 140;  // fallback
+      const bh = no.offsetHeight || 48;  // fallback
+
+      // limites para manter visível
+      const maxX = Math.max(margin, vw - bw - margin);
+      const maxY = Math.max(margin, vh - bh - margin);
+
+      // posição aleatória dentro dos limites
+      const x = Math.floor(Math.random() * maxX);
+      const y = Math.floor(Math.random() * maxY);
+
+      no.style.left = x + 'px';
+      no.style.top  = y + 'px';
     }
 
-    yesButton.addEventListener("click", () => {
-      document.body.style.backgroundColor = "#7FFF00"; // Background color turns green
-      heartModal.style.display = "block"; // Exibir a modal do coração
-      createFloatingHeart();
-      createFloatingHeart();
-      createFloatingHeart();
+    // posiciona inicialmente perto do grupo de botões
+    function placeNoNearGroup() {
+      const group = document.getElementById('btnGroup').getBoundingClientRect();
+      // tenta posicionar abaixo do grupo, mas com segurança
+      const x = Math.max(10, Math.min(group.left + (group.width/2) - (no.offsetWidth/2), window.innerWidth - no.offsetWidth - 10));
+      const y = Math.max(10, Math.min(group.bottom + 12, window.innerHeight - no.offsetHeight - 10));
+      no.style.left = x + 'px';
+      no.style.top  = y + 'px';
+    }
 
-      setTimeout(() => {
-        document.body.style.backgroundColor = "#f0f0f0";
-        heartModal.style.display = "none"; // Esconder a modal do coração
-      }, 4000);
+    // no mobile, após rolar/resizar, mantemos visível
+    window.addEventListener('resize', () => {
+      placeNoNearGroup();
     });
 
-    noButton.addEventListener("click", () => {
-      noButtonClickCount++;
-
-      if (noButtonClickCount >= 5) {
-        alert("Deixe de ser teimosa, clique em 'Sim' para continuar.");
+    // clique do "Não"
+    no.addEventListener('click', () => {
+      noClickCount++;
+      moveNoButton();
+      if (noClickCount >= 5) {
+        alert("Pronto, já me diverti 😅. Se o teu ‘não’ for sério, eu respeito — mas o meu ‘sim’ por ti continua aqui. 💙");
+        // opcional: reseta o contador para repetir o ciclo
+        noClickCount = 0;
       }
-
-      noButton.style.position = "absolute";
-      const maxWidth = window.innerWidth - noButton.clientWidth;
-      const maxHeight = window.innerHeight - noButton.clientHeight;
-      const randomX = Math.floor(Math.random() * maxWidth);
-      const randomY = Math.floor(Math.random() * maxHeight);
-      noButton.style.left = `${randomX}px`;
-      noButton.style.top = `${randomY}px`;
-
-      noButton.classList.add("animate__animated", "animate__fadeOutUp");
-      setTimeout(() => {
-        noButton.classList.remove("animate__animated", "animate__fadeOutUp");
-      }, 1000);
     });
+
+    // posicionamento inicial
+    window.requestAnimationFrame(placeNoNearGroup);
   </script>
 </body>
 </html>
